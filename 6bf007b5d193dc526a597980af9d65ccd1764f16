@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_51832ccd",
+        "filename": "drivers/media/radio/radio-iris.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 5191,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2016-09-06T08:40:43Z",
+      "side": 1,
+      "message": "The unlock is just a few lines below: L#5211",
+      "revId": "6bf007b5d193dc526a597980af9d65ccd1764f16",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
