@@ -2018,23 +2018,6 @@ static void update_fw_in_wq(struct work_struct *work)
 }
 /***********add byjinpeng_He for update firmware in workqueue begin****************/
 
-
-
-/* +++ anna  add for proximity trigger disable touch +++ */
-void ftxxxx_disable_touch(bool flag)
-{
-	if (flag) {
-		disable_tp_flag = true;
-		printk("[Focal][Touch] %s: proximity trigger disable touch !\n", __func__);
-	} else {
-		disable_tp_flag = false;
-		printk("[Focal][Touch] %s: proximity trigger enable touch  !\n", __func__);
-	}
-}
-EXPORT_SYMBOL(ftxxxx_disable_touch);
-
-/* --- anna add for proximity trigger disable touch --- */
-
 /*****add by jinpeng_he for touch disable or enable from execute /proc/asus_touch_proximity_status ++++******/
 struct proc_dir_entry *touchsensor_entry = NULL;
 static ssize_t amax_disable_touch_write(struct file *filp, const char __user *buff, size_t len, loff_t *off)
