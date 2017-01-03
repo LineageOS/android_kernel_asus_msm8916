@@ -47,14 +47,16 @@
 
 
 /**add by jinpeng_He for early_suspend+++**/
-//#if defined(CONFIG_FB)
-//#include <linux/notifier.h>
-//#include <linux/fb.h>
-//struct notifier_block tp_fb_notif;
+#if defined(CONFIG_FB)
+#include <linux/notifier.h>
+#include <linux/fb.h>
 
-//static int asus_otg_fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data);
+struct notifier_block tp_fb_notif;
+struct work_struct tp_fb_notify_work;
 
-//#endif
+static int fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data);
+static void fb_notify_resume_work(struct work_struct *work);
+#endif
 
 /*#include "linux/input/proximity_class.h"*/
 /*#include <linux/ft3x17.h>*/
@@ -2307,12 +2309,13 @@ static int ftxxxx_ts_probe(struct i2c_client *client, const struct i2c_device_id
 
 
 
-//#if defined(CONFIG_FB)
-//tp_fb_notif.notifier_call = asus_otg_fb_notifier_callback;
-//	err = fb_register_client(&tp_fb_notif);
-//	if (err)
-//		printk( "[Focal][Touch]Unable to register fb_notifier: %d\n", err);
-//#endif
+#if defined(CONFIG_FB)
+	INIT_WORK(&tp_fb_notify_work, fb_notify_resume_work);
+	tp_fb_notif.notifier_call = fb_notifier_callback;
+	err = fb_register_client(&tp_fb_notif);
+	if (err)
+		printk( "[Focal][Touch]Unable to register fb_notifier: %d\n", err);
+#endif
 
 	ftxxxx_ts->reset_wq = create_singlethread_workqueue("focal_reset_ic_wq");
 	if (!ftxxxx_ts->reset_wq) {
@@ -2473,9 +2476,9 @@ exit_request_reset:
 #endif
 
 err_create_wq_failed:
-//#if defined(CONFIG_FB)
-//	fb_unregister_client(&tp_fb_notif);
-//#endif
+#if defined(CONFIG_FB)
+	fb_unregister_client(&tp_fb_notif);
+#endif
 	if (ftxxxx_ts->reset_wq) {
 		destroy_workqueue(ftxxxx_ts->reset_wq);
 	}
@@ -2505,71 +2508,49 @@ exit_check_functionality_failed:
 	return err;
 }
 
-//#if defined(CONFIG_FB)
-//static void ftxxxx_ts_early_suspend(void)
-//{
-//	ftxxxx_suspend();
-//}
-
-
-//static void ftxxxx_ts_late_resume(void)
-//{
-//	
-//	queue_work(ftxxxx_ts->resume_wq, &ftxxxx_ts->resume_work);
-//}
-//static int asus_otg_fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data)
-//{
-//	struct fb_event *evdata = data;
-//	static int blank_old = 0;
-//	int *blank;
-
-//	if (evdata && evdata->data && event == FB_EVENT_BLANK) {
-//		blank = evdata->data;
-//		if (*blank == FB_BLANK_UNBLANK) {
-//			if (blank_old == FB_BLANK_POWERDOWN) {
-//				blank_old = FB_BLANK_UNBLANK;
-//				ftxxxx_ts_late_resume();
-//			}
-//		} else if (*blank == FB_BLANK_POWERDOWN) {
-//			if (blank_old == 0 || blank_old == FB_BLANK_UNBLANK) {
-//				blank_old = FB_BLANK_POWERDOWN;
-//				ftxxxx_ts_early_suspend();
-//			}
-//		}
-//	}
-//	return 0;
-//}
-//#else
-//static int ftxxxx_ts_suspend(struct device *dev)
-//{
-//	ftxxxx_suspend();
-//	return 0;
-//}
-//static int ftxxxx_ts_resume(struct device *dev);
-//{
-//	queue_work(ftxxxx_ts->resume_wq, &ftxxxx_ts->resume_work);
-//	return 0;
-//}
-//static const struct dev_pm_ops ftxxxx_ts_pm_ops = {
-//	.suspend = ftxxxx_ts_suspend,
-//	.resume = ftxxxx_ts_resume,
-//};
-
-//#endif
-#ifdef FTS_PM
-void ftxxxx_ts_suspend(void)
+#if defined(CONFIG_FB)
+static void ftxxxx_ts_suspend(void)
 {
-	queue_work(ftxxxx_ts->suspend_resume_wq,&ftxxxx_ts->suspend_work);
+	queue_work(ftxxxx_ts->suspend_resume_wq, &ftxxxx_ts->suspend_work);
 	return;
 }
-EXPORT_SYMBOL(ftxxxx_ts_suspend);
-void ftxxxx_ts_resume(void)
+
+static void ftxxxx_ts_resume(void)
 {
-	queue_work(ftxxxx_ts->suspend_resume_wq,&ftxxxx_ts->resume_work);
+	queue_work(ftxxxx_ts->suspend_resume_wq, &ftxxxx_ts->resume_work);
 	return;
 }
-EXPORT_SYMBOL(ftxxxx_ts_resume);
+
+static void fb_notify_resume_work(struct work_struct *work)
+{
+	ftxxxx_ts_resume();
+}
+
+static int fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data)
+{
+	struct fb_event *evdata = data;
+	int *blank;
+
+	if (evdata && evdata->data && event == FB_EVENT_BLANK) {
+		blank = evdata->data;
+		switch (*blank) {
+		case FB_BLANK_UNBLANK:
+		case FB_BLANK_NORMAL:
+		case FB_BLANK_VSYNC_SUSPEND:
+		case FB_BLANK_HSYNC_SUSPEND:
+			ftxxxx_ts_resume();
+			break;
+		default:
+		case FB_BLANK_POWERDOWN:
+			ftxxxx_ts_suspend();
+			break;
+		}
+	}
+
+	return 0;
+}
 #endif
+
 static int ftxxxx_ts_remove(struct i2c_client *client)
 {
 	struct ftxxxx_ts_data *ftxxxx_ts;
@@ -2626,10 +2607,6 @@ static struct i2c_driver ftxxxx_ts_driver = {
 		.name = FTXXXX_NAME,
 		.owner = THIS_MODULE,
 		.of_match_table = ft5x46_match_table,
-	//	#ifdef CONFIG_FB
-	//	#else
-	//	   .pm = &ftxxxx_ts_pm_ops,
-	//	#endif
 	},
 };
 
