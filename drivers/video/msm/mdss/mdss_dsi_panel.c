@@ -42,8 +42,6 @@
 #define DEFAULT_MDP_TRANSFER_TIME 14000
 
 DEFINE_LED_TRIGGER(bl_led_trigger);
-extern void ftxxxx_ts_suspend(void);
-extern void ftxxxx_ts_resume(void);
 
 #define PANEL_CABC_MASK	0x3
 //extern void rt4532_set(void);
@@ -842,8 +840,6 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		gpio_set_value((ctrl->bklt_en_gpio), 1);
 	}
 
-   ftxxxx_ts_resume();//resume touch
-
 end:
 	pinfo->blank_state = MDSS_PANEL_BLANK_UNBLANK;
 	pr_debug("%s:-\n", __func__);
@@ -894,7 +890,6 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
 	struct mdss_panel_info *pinfo;
-	ftxxxx_ts_suspend();//suspend touch
 	
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
