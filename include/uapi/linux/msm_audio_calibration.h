@@ -44,10 +44,6 @@
 							217, void *)
 #define AUDIO_SET_RTAC_AFE_CAL		_IOWR(CAL_IOCTL_MAGIC, \
 							218, void *)
-//<anna-cheng>for proximity near close touch in call
-#define AUDIO_SET_MODE		_IOWR(CAL_IOCTL_MAGIC, \
-							219, void *)
-extern int get_audiomode(void);							
 enum {
 	CVP_VOC_RX_TOPOLOGY_CAL_TYPE = 0,
 	CVP_VOC_TX_TOPOLOGY_CAL_TYPE,
@@ -93,8 +89,8 @@ enum {
 	DTS_EAGLE_CAL_TYPE,
 	AUDIO_CORE_METAINFO_CAL_TYPE,
 	SRS_TRUMEDIA_CAL_TYPE,
+
 	CORE_CUSTOM_TOPOLOGIES_CAL_TYPE,
-	SET_MODE_TYPE,
 	MAX_CAL_TYPES,
 };
 

@@ -35,10 +35,8 @@ struct audio_cal_info {
 };
 
 static struct audio_cal_info	audio_cal;
-//<anna-cheng>for proximity near close touch in call
-int audio_mode = -1;
-int mode = -1;
-//<anna-cheng>for proximity near close touch in call
+
+
 static bool callbacks_are_equal(struct audio_cal_callbacks *callback1,
 				struct audio_cal_callbacks *callback2)
 {
@@ -408,18 +406,6 @@ static long audio_cal_shared_ioctl(struct file *file, unsigned int cmd,
 	case AUDIO_GET_CALIBRATION:
 	case AUDIO_POST_CALIBRATION:
 		break;
-		//<anna-cheng>for proximity near close touch in call
-	case AUDIO_SET_MODE:
-		mutex_lock(&audio_cal.cal_mutex[SET_MODE_TYPE]);
-		if(copy_from_user(&mode, (void *)arg,sizeof(mode))) {
-			pr_err("%s: Could not copy lmode to user\n", __func__);
-			ret = -EFAULT;
-		}
-		audio_mode = mode;
-		printk("%s: Audio mode status:audio_mode=%d\n",__func__,audio_mode);
-		mutex_unlock(&audio_cal.cal_mutex[SET_MODE_TYPE]);
-		goto done;
-		//<anna-cheng>for proximity near close touch in call
 	default:
 		pr_err("%s: ioctl not found!\n", __func__);
 		ret = -EFAULT;
@@ -530,14 +516,6 @@ done:
 	return ret;
 }
 
-//<anna-cheng>for proximity near close touch in call
-int get_audiomode(void)
-{
-    printk("%s: Audio mode=%d\n",__func__, audio_mode);
-    return audio_mode;
-}
-EXPORT_SYMBOL(get_audiomode);
-//<anna-cheng>for proximity near close touch in call
 static long audio_cal_ioctl(struct file *f,
 		unsigned int cmd, unsigned long arg)
 {
@@ -558,9 +536,7 @@ static long audio_cal_ioctl(struct file *f,
 							204, compat_uptr_t)
 #define AUDIO_POST_CALIBRATION32	_IOWR(CAL_IOCTL_MAGIC, \
 							205, compat_uptr_t)
-//<anna-cheng>for proximity near close touch in call
-#define AUDIO_SET_MODE32	_IOWR(CAL_IOCTL_MAGIC, \
-								219, compat_uptr_t)
+
 static long audio_cal_compat_ioctl(struct file *f,
 		unsigned int cmd, unsigned long arg)
 {
@@ -585,12 +561,7 @@ static long audio_cal_compat_ioctl(struct file *f,
 		break;
 	case AUDIO_POST_CALIBRATION32:
 		cmd64 = AUDIO_POST_CALIBRATION;
-		break; 
-		//<anna-cheng>for proximity near close touch in call
-	case AUDIO_SET_MODE32:
-		cmd64 = AUDIO_SET_MODE;
 		break;
-		//<anna-cheng>for proximity near close touch in call
 	default:
 		pr_err("%s: ioctl not found!\n", __func__);
 		ret = -EFAULT;
@@ -623,7 +594,7 @@ static int __init audio_cal_init(void)
 {
 	int i = 0;
 	pr_debug("%s\n", __func__);
-	audio_mode = 0; //<anna-cheng>for proximity near close touch in call
+
 	memset(&audio_cal, 0, sizeof(audio_cal));
 	mutex_init(&audio_cal.common_lock);
 	for (; i < MAX_CAL_TYPES; i++) {

@@ -90,7 +90,6 @@ struct proc_dir_entry *lightsensor_entry = NULL;
 struct proc_dir_entry *proximitysensor_entry = NULL;
  //<ASUS-annacheng20150129+><<<<<+
  extern bool proximityap3426_check_status(void);
- extern int get_audiomode(void);
 //<++++++ward_du+++++++>
 static int lpsensor_proc_show(struct seq_file *m, void *v) {
 	if(!lpsensor_entry)
