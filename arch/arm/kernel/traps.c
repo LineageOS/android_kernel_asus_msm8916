@@ -38,6 +38,11 @@
 
 #include <trace/events/exception.h>
 
+#include <linux/stacktrace.h>
+
+static int asus_save_stack = 0;
+static struct stack_trace *asus_strace = NULL;
+
 static const char *handler[]= {
 	"prefetch abort",
 	"data abort",
@@ -68,6 +73,13 @@ void dump_backtrace_entry(unsigned long where, unsigned long from, unsigned long
 #else
 	printk("Function entered at [<%08lx>] from [<%08lx>]\n", where, from);
 #endif
+
+	if (asus_save_stack && (asus_strace->max_entries > asus_strace->nr_entries))
+		asus_strace->entries[asus_strace->nr_entries++] = where;
+
+	/* only print call stack for NOT getting asus slow log */
+	if (!asus_save_stack)
+		print_ip_sym(where);
 
 	if (in_exception_text(where))
 		dump_mem("", "Exception stack", frame + 4, frame + 4 + sizeof(struct pt_regs));
@@ -216,6 +228,20 @@ void show_stack(struct task_struct *tsk, unsigned long *sp)
 	dump_backtrace(NULL, tsk);
 	barrier();
 }
+
+void save_stack_trace_asus(struct task_struct *tsk, struct stack_trace *trace)
+{
+    asus_save_stack = 1;
+    asus_strace = trace;
+    dump_backtrace(NULL, tsk);
+    asus_save_stack = 0;
+}
+
+void dump_stack(void)
+{
+	dump_backtrace(NULL, NULL);
+}
+EXPORT_SYMBOL(dump_stack);
 
 #ifdef CONFIG_PREEMPT
 #define S_PREEMPT " PREEMPT"

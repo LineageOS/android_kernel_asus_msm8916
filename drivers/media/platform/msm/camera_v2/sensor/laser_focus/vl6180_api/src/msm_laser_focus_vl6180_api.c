@@ -759,7 +759,7 @@ static int ATD_VL6180x_device_get_range_read(struct seq_file *buf, void *v)
 
 	if (vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_OFF ||
 		vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_DEINIT_CCI) {
-		DBG_LOG("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
+		pr_err("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
 		seq_printf(buf, "%d\n", 0);
 		mutex_unlock(&vl6180x_mutex);
 		return 0;
@@ -859,7 +859,7 @@ static int ATD_VL6180x_device_get_more_value_read(struct seq_file *buf, void *v)
 
 	if (vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_OFF ||
 		vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_DEINIT_CCI) {
-		DBG_LOG("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
+		pr_err("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
 		seq_printf(buf, "%d\n", 0);
 		mutex_unlock(&vl6180x_mutex);
 		return 0;
@@ -952,7 +952,7 @@ static int ATD_VL6180x_device_clibration_offset(void)
 
 	if (vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_OFF ||
 		vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_DEINIT_CCI) {
-		DBG_LOG("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
+		pr_err("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
 		mutex_unlock(&vl6180x_mutex);
 		return -EBUSY;
 	}
@@ -1049,7 +1049,7 @@ static int ATD_VL6180x_device_clibration_crosstalkoffset(void)
 
 	if (vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_OFF ||
 		vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_DEINIT_CCI) {
-		DBG_LOG("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
+		pr_err("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
 		mutex_unlock(&vl6180x_mutex);
 		return -EBUSY;
 	}
@@ -1383,7 +1383,7 @@ static int dump_VL6180x_debug_register_read(struct seq_file *buf, void *v)
 	
 	if (vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_OFF ||
 		vl6180x_t->device_state == MSM_LASER_FOCUS_DEVICE_DEINIT_CCI) {
-		DBG_LOG("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
+		pr_err("%s:%d Device without turn on: (%d) \n", __func__, __LINE__, vl6180x_t->device_state);
 		return -EBUSY;
 	}
 	
