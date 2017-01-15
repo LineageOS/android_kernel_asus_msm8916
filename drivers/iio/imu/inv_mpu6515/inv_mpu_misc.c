@@ -2079,7 +2079,7 @@ ssize_t inv_dmp_firmware_write(struct file *fp, struct kobject *kobj,
 	struct iio_dev *indio_dev;
 	struct inv_mpu_state *st;
 
-	//printk("zxtest inv_dmp_firmware_write  DMP image size - expected %d, actual %ld\n",
+	//printk("zxtest inv_dmp_firmware_write  DMP image size - expected %d, actual %zu\n",
 	//		DMP_IMAGE_SIZE, size);
 
 	indio_dev = dev_get_drvdata(container_of(kobj, struct device, kobj));
@@ -2092,7 +2092,7 @@ ssize_t inv_dmp_firmware_write(struct file *fp, struct kobject *kobj,
 
 	reg = &st->reg;
 	if (DMP_IMAGE_SIZE != size) {
-		pr_err("wrong DMP image size - expected %d, actual %ld\n",
+		pr_err("wrong DMP image size - expected %d, actual %zu\n",
 			DMP_IMAGE_SIZE, size);
 		return -EINVAL;
 	}
@@ -2116,14 +2116,14 @@ ssize_t inv_dmp_firmware_write(struct file *fp, struct kobject *kobj,
 	if (result)
 		goto firmware_write_fail;
 	inv_test_reset(st);
-//printk("zxtest set_power_state  DMP image size - expected %d, actual %ld\n",
+//printk("zxtest set_power_state  DMP image size - expected %d, actual %zu\n",
 //			DMP_IMAGE_SIZE, size);
 	result = inv_load_firmware(st, firmware, size);
 	if (result) printk("mpu6515 inv_load_firmware  return = %d\n",
 			result);
 	if (result)
 		goto firmware_write_fail;
-//printk("zxtest inv_load_firmware  DMP image size - expected %d, actual %ld\n",
+//printk("zxtest inv_load_firmware  DMP image size - expected %d, actual %zu\n",
 //			DMP_IMAGE_SIZE, size);
 	result = inv_verify_firmware(st, firmware, size);
 	//<asus_zx20150328>+>>
@@ -2131,7 +2131,7 @@ ssize_t inv_dmp_firmware_write(struct file *fp, struct kobject *kobj,
 			result);
 		//goto firmware_write_fail;
 	//<asus_zx20150328>+<<
-//printk("zxtest inv_verify_firmware  DMP image size - expected %d, actual %ld\n",
+//printk("zxtest inv_verify_firmware  DMP image size - expected %d, actual %zu\n",
 //			DMP_IMAGE_SIZE, size);
 	result = inv_i2c_single_write(st, reg->prgm_strt_addrh,
 	st->chip_config.prog_start_addr >> 8);
@@ -2159,13 +2159,13 @@ firmware_write_fail:
 	mutex_unlock(&indio_dev->mlock);
 	kfree(firmware);
 	
-//		pr_err("zxtest inv_dmp_firmware_write  DMP image size - expected %d, actual %ld\n",
+//		pr_err("zxtest inv_dmp_firmware_write  DMP image size - expected %d, actual %zu\n",
 //			result, size);
 
 
 	if (result)
 		return result;
-//	pr_err("zxtest1 inv_dmp_firmware_write  DMP image size - expected %d, actual %ld\n",
+//	pr_err("zxtest1 inv_dmp_firmware_write  DMP image size - expected %d, actual %zu\n",
 //			result, size);
 	return size;
 }
@@ -2244,7 +2244,7 @@ ssize_t inv_six_q_write(struct file *fp, struct kobject *kobj,
 	}
 	reg = &st->reg;
 	if (QUATERNION_BYTES != size) {
-		pr_err("wrong quaternion size=%ld, should=%d\n", size,
+		pr_err("wrong quaternion size=%zu, should=%d\n", size,
 							QUATERNION_BYTES);
 		mutex_unlock(&indio_dev->mlock);
 		return -EINVAL;
