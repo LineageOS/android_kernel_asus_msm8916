@@ -28,9 +28,10 @@
 #include <linux/suspend.h>
 #include <linux/syscore_ops.h>
 #include <linux/io.h>
+#include <soc/qcom/socinfo.h>
 
 #include <generated/utsrelease.h>
-#include <soc/qcom/socinfo.h>
+
 #include "base.h"
 
 MODULE_AUTHOR("Manuel Estrada Sainz");
@@ -382,7 +383,8 @@ static bool fw_get_filesystem_firmware(struct device *device,
 	int i;
 	bool success = false;
 	char *path = __getname();
-        apply_volte_modem_fw_path();
+	apply_volte_modem_fw_path();
+
 	for (i = 0; i < ARRAY_SIZE(fw_path); i++) {
 		struct file *file;
 

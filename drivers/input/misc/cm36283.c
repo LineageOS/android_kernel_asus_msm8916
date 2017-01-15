@@ -736,12 +736,9 @@ static void proximity_initial_value_work_routine(struct work_struct *work){
 	               input_sync(lpi->ps_input_dev);    
                                proximity_state = 1; //<asus-wx20150429+>
 			       D("[PS][CM36283] proximity initial FAR\n");  
-				 ftxxxx_disable_touch(false);
 			 }
         }
 
-	
-	
          enable_irq(lpi->irq);		
 }
 
@@ -787,7 +784,6 @@ bool proximity_check_status(void){
 			 }else{
 			       D("[PS][CM36283] proximity initial FAR\n");  
 				p_value = 0; //<asus-wx20150814>
-				ftxxxx_disable_touch(false);
 			 }
         }
 //<asus-wx20150814>+>>
@@ -1201,7 +1197,6 @@ static int psensor_disable(struct CM36283_info *lpi)
 	mutex_unlock(&ps_disable_mutex); //For next time event be guaranteed to be sent! 
 	input_report_abs(lpi->ps_input_dev, ABS_DISTANCE, 4);     
 	input_sync(lpi->ps_input_dev);    
-	ftxxxx_disable_touch(false);
 	return ret;
 }
 
@@ -3289,7 +3284,7 @@ static int control_and_report( struct CM36283_info *lpi, uint8_t mode, uint16_t 
         input_sync(lpi->ps_input_dev);
 		proximity_state = val; //<asus-wx20150506+>
 //<anna-cheng>for proximity near close touch in call
-	if(proximity_state == 0){
+	if(val == 0){
 		if (2 == get_audiomode()) {
 			ftxxxx_disable_touch(true);
 			//pr_err("[PS][CM36283] proximity --anna close  in call \n");
@@ -3443,7 +3438,7 @@ static int CM36283_suspend(struct device *dev)
     struct CM36283_info *lpi = lp_info_cm36283;
 	int status_calling = lpi->ps_enable; //<asus-wx20150429>
    	pr_err("CM32683:  CM36283_suspend\n");
-	
+
 	lpi->status_calling = status_calling; //<asus-wx20150429+>
 //<asus-wx20150506>->> don't power off when suspend
 /*
@@ -3491,7 +3486,6 @@ static int CM32683_resume(struct device *dev)
 	 struct CM36283_info *lpi = lp_info_cm36283;
 	int status_calling = lpi->status_calling; //<asus-wx20150429+>
      pr_err("CM36283:  CM32683_resume\n");
-
 //<asus-wx20150429>+>>
 	if (!status_calling) {
 //<asus-wx20150506>->> don't power off when suspend
