@@ -1300,9 +1300,13 @@ boolean TestItem_RawDataTest_FT5X46(void)
 	boolean bTestReuslt = true;
 	boolean bUse = false;
 	int i = 0, j = 0, count = 0;
-	char buf[1024];
+	//char buf[1023];
+	char *buf = NULL;	
 	short min_value, max_value;
 	FTS_DBG("hjptest--->==============================Test Item: -----  RawDataTest_FT5X46\n");
+	
+	buf = kmalloc(1024, GFP_KERNEL);
+	memset(buf, 0x00, sizeof(char)*1024);
 
 	//ÉèÖÃµÍÆµµã
 	if(g_TestParam_FT5X46.RawDataTest_LowFreq == 1)
@@ -1512,9 +1516,9 @@ boolean TestItem_RawDataTest_FT5X46(void)
 		}	
 
 	}
-
+          
 TEST_END:
-
+           kfree(buf);       
 	if(bUse)
 	{
 		if( bTestReuslt)
@@ -1526,7 +1530,7 @@ TEST_END:
 			printk("hjptest--->RawData Test is NG.\n");
 		}
 	}
-
+      
 	return bTestReuslt;
 }
 
@@ -1557,6 +1561,7 @@ Mutual_ShortTest:
 ==================================================================================*/
 boolean TestItem_WeakShortTest(void)
 {
+//#if 0
 	//kernel_fpu_begin();	
 	unsigned char ReCode = ERROR_CODE_COMM_ERROR;
 	boolean bRet = true;
@@ -1568,7 +1573,9 @@ boolean TestItem_WeakShortTest(void)
 	int *iAdcData = NULL;
 	/*int iAdcData[sizeof(int)*iAllAdcDataNum];*/
 	int fKcal = 0;
-	int fMShortResistance[80*2], fGShortResistance[80*2];
+	//int fMShortResistance[80*2], fGShortResistance[80*2];
+	int* fMShortResistance=NULL;
+	int* fGShortResistance=NULL;
 	//float fKcal = 0;
 	//float fMShortResistance[80*2], fGShortResistance[80*2];
 	int iDoffset = 0, iDsen = 0, iDrefn = 0, iMaxD = 0;
@@ -1576,6 +1583,11 @@ boolean TestItem_WeakShortTest(void)
 	int iCount = 0;
 	int iMin_CC = g_TestParam_FT5X46.WeakShortTest_CC_Min;
 
+	fMShortResistance = kmalloc(160, GFP_KERNEL);
+	memset(fMShortResistance, 0x00, sizeof(int)*160);
+
+	fGShortResistance = kmalloc(160, GFP_KERNEL);
+	memset(fGShortResistance, 0x00, sizeof(int)*160);
 
 	FTS_DBG("==============================Test Item: -----  Weak Short-Circuit Test \n");
 	//TxNum¼Ä´æÆ÷£º0x02(Read Only)
@@ -1746,12 +1758,15 @@ TEST_END:
 	{
 		FTS_DBG("//Weak Short Test is NG.\n");
 	}
-
+       kfree(fMShortResistance);
+	kfree(fGShortResistance);
 	kfree(iAdcData);
 
 	return bRet;
 	//kernel_fpu_end();
 	//return true;
+//#endif
+      //  return true;
 }
 /*==================================================================================
 
@@ -2372,15 +2387,18 @@ unsigned char ReadRawData(unsigned char Freq, unsigned char LineNum, int ByteNum
 }
 boolean TestItem_SCapRawDataTest()
 {
+
 	int i,RawDataMin,RawDataMax,Value;
 	boolean bFlag = true;
 	unsigned char ReCode;
 	boolean btmpresult = true;
 	int iMax, iMin, iAvg;
-	int prawData[300] = {0};
+	int* prawData= NULL;
 	unsigned char regAddr = 0x09, regData = 0;
 
 	FTS_DBG("hjptest--->==============================Test Item: -----  Scap_RawData_Test_FT5X46\n");
+	prawData = kmalloc(300, GFP_KERNEL);
+	memset(prawData, 0x00, sizeof(int)*300);
 
    	 ReCode = ReadReg( regAddr, &regData );
 	printk("hjptest--->[Focal] %s : Water_Channel_Select ReCode = %d regData = %d \n", __func__, ReCode, regData);
@@ -2395,7 +2413,7 @@ boolean TestItem_SCapRawDataTest()
 		for (i = 0; i < 1; i++) {
 			memset(SCap_rawData, 0, sizeof(SCap_rawData));
 
-			memset(prawData, 0, sizeof(prawData));
+			//memset(prawData, 0, sizeof(prawData));
  
 			
 			/*Water resist raw data*/
@@ -2550,14 +2568,16 @@ boolean TestItem_SCapRawDataTest()
 	} else {
 		btmpresult = false;
 	}
-
+            
 TEST_END:
+	     kfree(prawData);
 	if (btmpresult) {
 		printk("hjptest--->SCap RawData Test is OK\n");
 	} else {
 		printk("hjptest--->SCap RawData Test is NG\n");
 	}
 	return btmpresult;
+
 }
 //zax 20150112++++++++++++++++++++++++++++++++++
 bool AnalyzeTestResultMCap_TXX( boolean bIncludeKey)

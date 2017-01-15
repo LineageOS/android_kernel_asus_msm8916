@@ -729,6 +729,7 @@ void asus_otg_host_mode_cleanup(void)
        cancel_delayed_work_sync(&early_suspend_delay_work);
 }
 
+/*
 static bool asus_otg_keep_power_on_check(void)
 {
        struct msm_otg *motg = the_msm_otg;
@@ -767,6 +768,7 @@ static bool asus_otg_keep_power_on_check(void)
        set_fs(oldfs);
        return ret;
 }
+*/
 
 static void asus_otg_host_auto_switch(enum host_auto_sw req_mode)
 {
@@ -821,7 +823,8 @@ static void asus_otg_early_suspend_delay_work(struct work_struct *w)
        dev_info(phy->dev, "%s()+++\n", __func__);
 
        if (motg->host_mode) {
-               g_keep_power_on = asus_otg_keep_power_on_check();
+               //g_keep_power_on = asus_otg_keep_power_on_check();
+               g_keep_power_on = 1;//always keep OTG power on when suspend
                dev_info(phy->dev, "g_keep_power_on (%d)\n", g_keep_power_on);
                if (!g_keep_power_on) {
                        g_suspend_delay_work_run = 1;
