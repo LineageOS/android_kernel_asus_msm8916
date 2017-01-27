@@ -6467,6 +6467,8 @@ static int msm_otg_probe(struct platform_device *pdev)
 	motg->pdata = pdata;
 	phy = &motg->phy;
 	phy->dev = &pdev->dev;
+	motg->dbg_idx = 0;
+	motg->dbg_lock = __RW_LOCK_UNLOCKED(lck);
 
 	if (motg->pdata->bus_scale_table) {
 		motg->bus_perf_client =
@@ -6682,8 +6684,6 @@ static int msm_otg_probe(struct platform_device *pdev)
 	/* Ensure that above STOREs are completed before enabling interrupts */
 	mb();
 
-	motg->dbg_idx = 0;
-	motg->dbg_lock = __RW_LOCK_UNLOCKED(lck);
 	init_completion(&gadget_init);
 	ret = msm_otg_mhl_register_callback(motg, msm_otg_mhl_notify_online);
 	if (ret)

@@ -402,7 +402,7 @@ static void ion_handle_get(struct ion_handle *handle)
 	kref_get(&handle->ref);
 }
 
-int ion_handle_put_nolock(struct ion_handle *handle)
+static int ion_handle_put_nolock(struct ion_handle *handle)
 {
 	int ret;
 
@@ -440,7 +440,7 @@ static struct ion_handle *ion_handle_lookup(struct ion_client *client,
 	return ERR_PTR(-EINVAL);
 }
 
-struct ion_handle *ion_handle_get_by_id_nolock(struct ion_client *client,
+static struct ion_handle *ion_handle_get_by_id_nolock(struct ion_client *client,
 						int id)
 {
 	struct ion_handle *handle;
