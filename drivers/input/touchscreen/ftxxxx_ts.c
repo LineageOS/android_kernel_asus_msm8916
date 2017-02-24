@@ -52,10 +52,8 @@
 #include <linux/fb.h>
 
 struct notifier_block tp_fb_notif;
-struct work_struct tp_fb_notify_work;
 
 static int fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data);
-static void fb_notify_resume_work(struct work_struct *work);
 #endif
 
 /*#include "linux/input/proximity_class.h"*/
@@ -2293,11 +2291,9 @@ static int ftxxxx_ts_probe(struct i2c_client *client, const struct i2c_device_id
 
 
 #if defined(CONFIG_FB)
-	INIT_WORK(&tp_fb_notify_work, fb_notify_resume_work);
 	tp_fb_notif.notifier_call = fb_notifier_callback;
-	err = fb_register_client(&tp_fb_notif);
-	if (err)
-		printk( "[Focal][Touch]Unable to register fb_notifier: %d\n", err);
+	if (fb_register_client(&tp_fb_notif))
+		printk("[Focal][Touch]Unable to register fb_notifier: %d\n", err);
 #endif
 
 	ftxxxx_ts->reset_wq = create_singlethread_workqueue("focal_reset_ic_wq");
@@ -2502,11 +2498,6 @@ static void ftxxxx_ts_resume(void)
 {
 	queue_work(ftxxxx_ts->suspend_resume_wq, &ftxxxx_ts->resume_work);
 	return;
-}
-
-static void fb_notify_resume_work(struct work_struct *work)
-{
-	ftxxxx_ts_resume();
 }
 
 static int fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data)
