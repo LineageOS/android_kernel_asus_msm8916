@@ -2514,9 +2514,11 @@ static int fb_notifier_callback(struct notifier_block *self, unsigned long event
 		case FB_BLANK_HSYNC_SUSPEND:
 			ftxxxx_ts_resume();
 			break;
-		default:
 		case FB_BLANK_POWERDOWN:
 			ftxxxx_ts_suspend();
+			break;
+		default:
+			/* Don't handle what we don't understand */
 			break;
 		}
 	}
