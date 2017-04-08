@@ -355,14 +355,18 @@ int modem_fw_path_applied = 0;
 static void __apply_volte_modem_fw_path(void) {
 	modem_fw_path_applied = 1;
 
-	if (asus_PRJ_ID != ASUS_ZE550KL) {
+	if (asus_PRJ_ID != ASUS_ZE550KL && asus_PRJ_ID != ASUS_ZD550KL) {
 		return;
 	}
 
 	if (cpu_is_msm8916()) {
 		strcpy(fw_path_para, "/etc/firmware/8916_volte_modem");
 	} else if (cpu_is_msm8939()) {
-		strcpy(fw_path_para, "/etc/firmware/8939_volte_modem");
+		if (asus_PRJ_ID == ASUS_ZD550KL) {
+			strcpy(fw_path_para, "/etc/firmware/8939_ZD550KL_volte_modem");
+		} else {
+			strcpy(fw_path_para, "/etc/firmware/8939_volte_modem");
+		}
 	} else {
 		printk(KERN_ERR "%s:unknown cpu id\n", __func__);
 	}
